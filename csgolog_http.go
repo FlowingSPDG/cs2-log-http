@@ -13,8 +13,9 @@ func CSGOLogger(Handler func(csgolog.Message)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		raw, err := c.GetRawData()
 		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
 			log.Printf("Failed to get raw data : %v\n", err)
+			c.String(http.StatusInternalServerError, err.Error())
+			c.Abort()
 			return
 		}
 
@@ -27,6 +28,8 @@ func CSGOLogger(Handler func(csgolog.Message)) gin.HandlerFunc {
 			msg, err := csgolog.Parse(scanner.Text())
 			if err != nil {
 				log.Printf("Failed to parse data : %v\n", err)
+				c.String(http.StatusInternalServerError, err.Error())
+				c.Abort()
 				return
 			}
 			Handler(msg)
