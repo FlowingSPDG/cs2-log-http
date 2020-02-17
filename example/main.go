@@ -25,7 +25,7 @@ func main() {
 }
 
 // MessageHandler handles message from CSGO Server and Gin middleware
-func MessageHandler(msg csgolog.Message) {
+func MessageHandler(msg csgolog.Message, c *gin.Context) {
 	switch m := msg.(type) {
 	case csgolog.PlayerEntered:
 		log.Printf("PlayerEntered : %v\n", m)

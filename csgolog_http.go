@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func CSGOLogger(Handler func(csgolog.Message)) gin.HandlerFunc {
+func CSGOLogger(Handler func(csgolog.Message, *gin.Context)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		raw, err := c.GetRawData()
 		if err != nil {
@@ -32,8 +32,7 @@ func CSGOLogger(Handler func(csgolog.Message)) gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			Handler(msg)
-
+			Handler(msg, c)
 		}
 		c.String(http.StatusOK, "OK")
 		c.Abort()
