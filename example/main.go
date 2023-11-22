@@ -11,15 +11,15 @@ import (
 func main() {
 	r := gin.Default()
 	logHandler := cs2loghttp.NewLogHandler(messageHandler)
-	r.POST("/csgolog", logHandler.Handle())
+	r.POST("/servers/:id/log", logHandler.Handle())
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Hello!"})
 	})
 	log.Panicf("Failed to listen port 3090 : %v\n", r.Run("0.0.0.0:3090"))
 }
 
-func messageHandler(ip string, msg cs2log.Message) {
-	log.Printf("IP : %s\n", ip)
+func messageHandler(ip string, id string, msg cs2log.Message) {
+	log.Printf("IP : %s / ID : %s\n", ip, id)
 	switch m := msg.(type) {
 	case cs2log.PlayerEntered:
 		log.Printf("PlayerEntered : %v\n", m)
