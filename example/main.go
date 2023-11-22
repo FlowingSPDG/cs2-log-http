@@ -18,15 +18,15 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.POST("/csgolog", cs2loghttp.CS2Logger(MessageHandler))
+	logHandler := cs2loghttp.NewLogHandler(MessageHandler)
+	r.POST("/csgolog", logHandler.Handle())
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Hello!"})
 	})
 	log.Panicf("Failed to listen port 3090 : %v\n", r.Run("0.0.0.0:3090"))
 }
 
-// MessageHandler handles message from CS2 Server and Gin middleware
-func MessageHandler(msg cs2log.Message, c *gin.Context) {
+func MessageHandler(msg cs2log.Message) {
 	switch m := msg.(type) {
 	case cs2log.PlayerEntered:
 		log.Printf("PlayerEntered : %v\n", m)
