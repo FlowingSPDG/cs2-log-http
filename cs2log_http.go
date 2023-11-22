@@ -1,15 +1,16 @@
-package csgologhttp
+package cs2loghttp
 
 import (
 	"bufio"
-	"github.com/FlowingSPDG/csgo-log"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	cs2log "github.com/janstuemmel/cs2-log"
 )
 
-func CSGOLogger(Handler func(csgolog.Message, *gin.Context)) gin.HandlerFunc {
+func CS2Logger(Handler func(cs2log.Message, *gin.Context)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		raw, err := c.GetRawData()
 		if err != nil {
@@ -19,13 +20,13 @@ func CSGOLogger(Handler func(csgolog.Message, *gin.Context)) gin.HandlerFunc {
 			return
 		}
 
-		csgolog.LogLinePattern = csgolog.HTTPLinePattern
+		// cs2log.LogLinePattern = cs2log.HTTPLinePattern
 
 		sl := strings.NewReader(string(raw))
 		scanner := bufio.NewScanner(sl)
 		for scanner.Scan() {
 			// fmt.Println(scanner.Text())
-			msg, err := csgolog.Parse(scanner.Text())
+			msg, err := cs2log.Parse(scanner.Text())
 			if err != nil {
 				log.Printf("Failed to parse data : %v\n", err)
 				c.String(http.StatusInternalServerError, err.Error())
