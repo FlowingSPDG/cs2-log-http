@@ -2,7 +2,6 @@ package cs2loghttp
 
 import (
 	"bufio"
-	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -14,7 +13,7 @@ import (
 // httpLogPattern is a regexp to parse the log line on HTTP
 var httpLogPattern = regexp.MustCompile(`(\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}.\d{3}) - (.*)`)
 
-type handler func(ip string, id string, msg cs2log.Message)
+type handler func(ip string, id string, msg cs2log.Message) error
 
 // NewLogHandler returns a new LogHandler. This function has side effect to override log line prefix.
 func NewLogHandler(h handler) LogHandler {
@@ -37,7 +36,6 @@ func (l *LogHandler) Handle() gin.HandlerFunc {
 
 		raw, err := c.GetRawData()
 		if err != nil {
-			log.Printf("Failed to get raw data : %v\n", err)
 			c.String(http.StatusInternalServerError, err.Error())
 			c.Abort()
 			return
@@ -48,12 +46,15 @@ func (l *LogHandler) Handle() gin.HandlerFunc {
 		for scanner.Scan() {
 			msg, err := cs2log.Parse(scanner.Text())
 			if err != nil {
-				log.Printf("Failed to parse data : %v\n", err)
 				c.String(http.StatusInternalServerError, err.Error())
 				c.Abort()
 				return
 			}
-			l.handler(c.ClientIP(), id, msg)
+			if err := l.handler(c.ClientIP(), id, msg); err != nil {
+				c.String(http.StatusInternalServerError, err.Error())
+				c.Abort()
+				return
+			}
 		}
 		c.String(http.StatusOK, "OK")
 	}
