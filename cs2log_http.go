@@ -14,8 +14,10 @@ import (
 // httpLogPattern is a regexp to parse the log line on HTTP
 var httpLogPattern = regexp.MustCompile(`(\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}.\d{3}) - (.*)`)
 
+type handler func(ip string, msg cs2log.Message)
+
 // NewLogHandler returns a new LogHandler. This function has side effect to override log line prefix.
-func NewLogHandler(h func(cs2log.Message)) LogHandler {
+func NewLogHandler(h handler) LogHandler {
 	// Override log line prefix
 	cs2log.LogLinePattern = httpLogPattern
 	return LogHandler{
@@ -25,7 +27,7 @@ func NewLogHandler(h func(cs2log.Message)) LogHandler {
 
 // LogHandler is a handler for cs2-log HTTP.
 type LogHandler struct {
-	handler func(cs2log.Message)
+	handler handler
 }
 
 // Handle returns a gin.HandlerFunc to handle cs2-log HTTP.
@@ -49,7 +51,7 @@ func (l *LogHandler) Handle() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			l.handler(msg)
+			l.handler(c.ClientIP(), msg)
 		}
 		c.String(http.StatusOK, "OK")
 	}

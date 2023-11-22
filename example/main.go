@@ -18,7 +18,8 @@ func main() {
 	log.Panicf("Failed to listen port 3090 : %v\n", r.Run("0.0.0.0:3090"))
 }
 
-func messageHandler(msg cs2log.Message) {
+func messageHandler(ip string, msg cs2log.Message) {
+	log.Printf("IP : %s\n", ip)
 	switch m := msg.(type) {
 	case cs2log.PlayerEntered:
 		log.Printf("PlayerEntered : %v\n", m)
