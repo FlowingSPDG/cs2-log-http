@@ -8,17 +8,9 @@ import (
 	cs2log "github.com/janstuemmel/cs2-log"
 )
 
-// File log format
-// L 11/12/2018 - 19:57:28: World triggered "Round_Start"
-// csgolog.LogLinePattern = regexp.MustCompile(`L (\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}): (.*)`)
-
-// HTTP log format
-// 02/09/2020 - 22:42:32.000 - World triggered "Round_Start"
-// csgolog.LogLinePattern = regexp.MustCompile(`(\d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}.\d{3}) - (.*)`)
-
 func main() {
 	r := gin.Default()
-	logHandler := cs2loghttp.NewLogHandler(MessageHandler)
+	logHandler := cs2loghttp.NewLogHandler(messageHandler)
 	r.POST("/csgolog", logHandler.Handle())
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Hello!"})
@@ -26,7 +18,7 @@ func main() {
 	log.Panicf("Failed to listen port 3090 : %v\n", r.Run("0.0.0.0:3090"))
 }
 
-func MessageHandler(msg cs2log.Message) {
+func messageHandler(msg cs2log.Message) {
 	switch m := msg.(type) {
 	case cs2log.PlayerEntered:
 		log.Printf("PlayerEntered : %v\n", m)
