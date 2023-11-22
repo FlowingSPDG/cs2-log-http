@@ -52,6 +52,5 @@ func (l *LogHandler) Handle() gin.HandlerFunc {
 			l.handler(msg)
 		}
 		c.String(http.StatusOK, "OK")
-		c.Abort()
 	}
 }
